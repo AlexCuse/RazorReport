@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq.Expressions;
+using System.Reflection;
 using RazorEngine;
 
 namespace RazorReport {
@@ -7,6 +9,7 @@ namespace RazorReport {
         string template;
         string masterTemplate;
         bool needsCompilation = true;
+        string titleTag;
 
         private ReportBuilder () { }
 
@@ -42,14 +45,35 @@ namespace RazorReport {
             return WithMasterTemplate (TemplateFinder.GetTemplateFromResource (templateFile, assembly));
         }
 
+        public IReportBuilder<T> WithTitle (Expression<Func<T, string>> titleGenerator) {
+            var mex = titleGenerator.Body as MemberExpression;
+            if (mex != null) {
+                titleTag = "@Model." + mex.Member.Name;
+                return this;
+            }
+
+            var mcex = titleGenerator.Body as MethodCallExpression;
+            if (mcex != null && mcex.Arguments.Count == 0) {
+                titleTag = "@Model." + mcex.Method.Name + "()";
+                return this;
+            }
+            
+            throw new InvalidOperationException("Invalid expression type passed.");
+        }
+
         public string BuildHtml (T model) {
             if (needsCompilation) {
-                var templateToUse = string.IsNullOrEmpty (masterTemplate) ? template : masterTemplate.Replace ("@@BODY", template);
+                var templateToUse = PrepareTemplate ();
                 Razor.Compile (templateToUse, typeof (T), name);
                 needsCompilation = false;
             }
 
             return Razor.Run<T> (model, name);
+        }
+
+        string PrepareTemplate () {
+            var output = (string.IsNullOrEmpty (masterTemplate)) ? template : masterTemplate.Replace ("@@BODY", template);
+            return output.Replace ("@@TITLE", titleTag);
         }
     }
 }

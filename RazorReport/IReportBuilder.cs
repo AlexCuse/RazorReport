@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace RazorReport {
     public interface IReportBuilder<T> {
@@ -8,6 +10,8 @@ namespace RazorReport {
         IReportBuilder<T> WithMasterTemplateFromFileSystem (string templateFile);
         IReportBuilder<T> WithTemplateFromResource (string templateFile, Assembly assembly);
         IReportBuilder<T> WithMasterTemplateFromResource (string templateFile, Assembly assembly);
+
+        IReportBuilder<T> WithTitle (Expression<Func<T, string>> titleGenerator);
 
         string BuildHtml (T model);
     }
