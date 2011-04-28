@@ -49,16 +49,18 @@ namespace RazorReport {
             var mex = titleGenerator.Body as MemberExpression;
             if (mex != null) {
                 titleTag = "@Model." + mex.Member.Name;
+                needsCompilation = true;
                 return this;
             }
 
             var mcex = titleGenerator.Body as MethodCallExpression;
             if (mcex != null && mcex.Arguments.Count == 0) {
                 titleTag = "@Model." + mcex.Method.Name + "()";
+                needsCompilation = true;
                 return this;
             }
-            
-            throw new InvalidOperationException("Invalid expression type passed.");
+
+            throw new InvalidOperationException ("Invalid expression type passed.");
         }
 
         public string BuildHtml (T model) {
