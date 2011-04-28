@@ -1,0 +1,18 @@
+﻿<body>
+    <h2>@Model.Name</h2>
+    Email: @Model.Email
+    <hr class="divider"></hr>
+    <table>
+        <tr><th>Key</th><th>Values</th></tr>
+        @foreach (var item in @Model.Values) {
+        <tr>
+            <td>
+                @item.Key
+            </td>
+            <td>
+                @item.Value
+            </td>
+        </tr>
+        }
+    </table>
+</body>
