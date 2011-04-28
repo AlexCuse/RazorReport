@@ -6,6 +6,14 @@ namespace RazorReport.Tests {
     [TestFixture]
     public class ReportBuilderTest {
         [Test]
+        public void Throws_Exception_If_Template_Undefined () {
+            var ex = Assert.Throws (typeof (InvalidOperationException),
+                          () => ReportBuilder<object>.Create ("named").BuildHtml (null));
+
+            Assert.AreEqual ("ReportBuilder must have Template configured before use.", ex.Message);
+        }
+
+        [Test]
         public void Correctly_Merges_Template_Into_Master () {
             var master = "some text and @@BODY and some more";
             var template = "THIS IS THE BODY";
@@ -113,6 +121,35 @@ namespace RazorReport.Tests {
                 builder.BuildHtml (model);
 
                 builder = builder.WithTemplate (newTemplate);
+
+                builder.BuildHtml (model);
+            }
+        }
+
+        [Test]
+        public void Recompiles_If_MasterTemplate_Changed () {
+            var mockery = new MockRepository ();
+            var engine = mockery.StrictMock<IEngine<Example>> ();
+
+            var templateName = "recompileIfChange";
+            var template = "template";
+            var masterTemplate = "master @@BODY";
+            var model = new Example ();
+
+            using (mockery.Record ()) {
+                engine.Compile (template, templateName);
+                engine.Compile (masterTemplate.Replace ("@@BODY", template), templateName);
+
+                Expect.Call (engine.Run (model, templateName)).Repeat.Twice ().Return ("return");
+            }
+
+            using (mockery.Playback ()) {
+                var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
+                    .WithTemplate (template);
+
+                builder.BuildHtml (model);
+
+                builder = builder.WithMasterTemplate (masterTemplate);
 
                 builder.BuildHtml (model);
             }

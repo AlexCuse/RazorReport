@@ -76,6 +76,8 @@ namespace RazorReport {
         }
 
         string PrepareTemplate () {
+            if (string.IsNullOrEmpty (template))
+                throw new InvalidOperationException ("ReportBuilder must have Template configured before use.");
             var output = (string.IsNullOrEmpty (masterTemplate)) ? template : masterTemplate.Replace ("@@BODY", template);
             return output.Replace ("@@TITLE", titleTag);
         }
