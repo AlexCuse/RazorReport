@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace RazorReport.Tests {
     [TestFixture]
@@ -86,6 +87,62 @@ namespace RazorReport.Tests {
 
             Assert.AreEqual ("Invalid expression type passed.", ex.Message);
 
+        }
+
+        [Test]
+        public void Recompiles_If_Template_Changed () {
+            var mockery = new MockRepository ();
+            var engine = mockery.StrictMock<IEngine<Example>> ();
+
+            var templateName = "recompileIfChange";
+            var template = "template";
+            var newTemplate = "template2";
+            var model = new Example ();
+
+            using (mockery.Record ()) {
+                engine.Compile (template, templateName);
+                engine.Compile (newTemplate, templateName);
+
+                Expect.Call (engine.Run (model, templateName)).Repeat.Twice ().Return ("return");
+            }
+
+            using (mockery.Playback ()) {
+                var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
+                    .WithTemplate (template);
+
+                builder.BuildHtml (model);
+
+                builder = builder.WithTemplate (newTemplate);
+
+                builder.BuildHtml (model);
+            }
+        }
+
+        [Test]
+        public void Doesnt_Recompile_If_No_Changes_To_Builder () {
+            var mockery = new MockRepository ();
+            var engine = mockery.StrictMock<IEngine<Example>> ();
+
+            var templateName = "doesntRecompileIfNoChange";
+            var template = "template";
+            var model = new Example ();
+
+            using (mockery.Record ()) {
+                engine.Compile (template, templateName);//just once
+
+                Expect.Call (engine.Run (model, templateName)).Repeat.Twice ().Return ("return");
+            }
+
+            using (mockery.Playback ()) {
+                var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
+                    .WithTemplate (template);
+
+                builder.BuildHtml (model);
+
+                model.Name = "changed";
+
+                builder.BuildHtml (model);
+            }
         }
     }
 }

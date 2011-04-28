@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using RazorEngine;
 
 namespace RazorReport {
     public class ReportBuilder<T> : IReportBuilder<T> {
@@ -10,11 +9,16 @@ namespace RazorReport {
         string masterTemplate;
         bool needsCompilation = true;
         string titleTag;
+        IEngine<T> engine;
 
         private ReportBuilder () { }
 
         public static IReportBuilder<T> Create (string name) {
-            return new ReportBuilder<T> { name = name };
+            return CreateWithEngineInstance (name, new Engine<T> ());
+        }
+
+        public static IReportBuilder<T> CreateWithEngineInstance (string name, IEngine<T> engine) {
+            return new ReportBuilder<T> { name = name, engine = engine };
         }
 
         public IReportBuilder<T> WithTemplate (string templateString) {
@@ -65,12 +69,10 @@ namespace RazorReport {
 
         public string BuildHtml (T model) {
             if (needsCompilation) {
-                var templateToUse = PrepareTemplate ();
-                Razor.Compile (templateToUse, typeof (T), name);
+                engine.Compile (PrepareTemplate (), name);
                 needsCompilation = false;
             }
-
-            return Razor.Run<T> (model, name);
+            return engine.Run (model, name);
         }
 
         string PrepareTemplate () {
