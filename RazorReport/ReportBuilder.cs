@@ -18,14 +18,14 @@ namespace RazorReport {
         }
 
         public IReportBuilder<T> WithTemplate (string templateString) {
+            needsCompilation = templateString != template;
             template = templateString;
-            needsCompilation = true;
             return this;
         }
 
         public IReportBuilder<T> WithMasterTemplate (string templateString) {
+            needsCompilation = masterTemplate != templateString;
             masterTemplate = templateString;
-            needsCompilation = true;
             return this;
         }
 
