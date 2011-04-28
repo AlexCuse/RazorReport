@@ -10,7 +10,7 @@ namespace RazorReport.Example {
         }
 
         string Test () {
-            var model = new Example { Name = "Alex", Email = "alex.ullrich@gmail.com", Values = new Dictionary<object, object> { { "Dogs", "Jasmine, Daisy" }, { "Cats", "Rocky, FuFu" } } };
+            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Dogs", "Jasmine, Daisy" }, { "Cats", "Rocky, FuFu" } } };
 
             var assembly = Assembly.GetExecutingAssembly ();
 
