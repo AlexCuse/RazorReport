@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace RazorReport {
     public class ReportBuilder<T> : IReportBuilder<T> {
         string name;
-        string template;
-        string masterTemplate;
+        string mainTemplate;
+        string styleSheet;
         bool needsCompilation = true;
-        string titleTag;
         IEngine<T> engine;
 
         private ReportBuilder () { }
@@ -21,50 +19,32 @@ namespace RazorReport {
             return new ReportBuilder<T> { name = name, engine = engine };
         }
 
-        public IReportBuilder<T> WithTemplate (string templateString) {
-            needsCompilation = templateString != template;
-            template = templateString;
+        public IReportBuilder<T> WithTemplate (string template) {
+            needsCompilation = mainTemplate != template;
+            mainTemplate = template;
             return this;
         }
 
-        public IReportBuilder<T> WithMasterTemplate (string templateString) {
-            needsCompilation = masterTemplate != templateString;
-            masterTemplate = templateString;
+        public IReportBuilder<T> WithTemplateFromFileSystem (string templatePath) {
+            return WithTemplate (TemplateFinder.GetTemplateFromFileSystem (templatePath));
+        }
+
+        public IReportBuilder<T> WithTemplateFromResource (string resourceName, Assembly assembly) {
+            return WithTemplate (TemplateFinder.GetTemplateFromResource (resourceName, assembly));
+        }
+
+        public IReportBuilder<T> WithCss (string css) {
+            needsCompilation = styleSheet != css;
+            styleSheet = css;
             return this;
         }
 
-        public IReportBuilder<T> WithTemplateFromFileSystem (string templateFile) {
-            return WithTemplate (TemplateFinder.GetTemplateFromFileSystem (templateFile));
+        public IReportBuilder<T> WithCssFromFileSystem (string cssPath) {
+            return WithCss (TemplateFinder.GetTemplateFromFileSystem (cssPath));
         }
 
-        public IReportBuilder<T> WithMasterTemplateFromFileSystem (string templateFile) {
-            return WithMasterTemplate (TemplateFinder.GetTemplateFromFileSystem (templateFile));
-        }
-
-        public IReportBuilder<T> WithTemplateFromResource (string templateFile, Assembly assembly) {
-            return WithTemplate (TemplateFinder.GetTemplateFromResource (templateFile, assembly));
-        }
-
-        public IReportBuilder<T> WithMasterTemplateFromResource (string templateFile, Assembly assembly) {
-            return WithMasterTemplate (TemplateFinder.GetTemplateFromResource (templateFile, assembly));
-        }
-
-        public IReportBuilder<T> WithTitle (Expression<Func<T, string>> titleGenerator) {
-            var mex = titleGenerator.Body as MemberExpression;
-            if (mex != null) {
-                titleTag = "@Model." + mex.Member.Name;
-                needsCompilation = true;
-                return this;
-            }
-
-            var mcex = titleGenerator.Body as MethodCallExpression;
-            if (mcex != null && mcex.Arguments.Count == 0) {
-                titleTag = "@Model." + mcex.Method.Name + "()";
-                needsCompilation = true;
-                return this;
-            }
-
-            throw new InvalidOperationException ("Invalid expression type passed.");
+        public IReportBuilder<T> WithCssFromResource (string resourceName, Assembly assembly) {
+            return WithCss (TemplateFinder.GetTemplateFromResource (resourceName, assembly));
         }
 
         public string BuildHtml (T model) {
@@ -76,10 +56,13 @@ namespace RazorReport {
         }
 
         string PrepareTemplate () {
-            if (string.IsNullOrEmpty (template))
+            if (string.IsNullOrEmpty (mainTemplate))
                 throw new InvalidOperationException ("ReportBuilder must have Template configured before use.");
-            var output = (string.IsNullOrEmpty (masterTemplate)) ? template : masterTemplate.Replace ("@@BODY", template);
-            return output.Replace ("@@TITLE", titleTag);
+            return mainTemplate.Replace ("@@STYLES", PrepareStylesheet ());
+        }
+
+        string PrepareStylesheet () {
+            return string.IsNullOrEmpty (styleSheet) ? string.Empty : string.Format ("<style type='text/css'>{1}{0}{1}</style>", styleSheet, Environment.NewLine);
         }
     }
 }

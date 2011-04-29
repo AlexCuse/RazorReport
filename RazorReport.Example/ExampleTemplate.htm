@@ -1,7 +1,13 @@
-﻿<body>
+﻿@DocType
+<html>
+<head>
+    @Styles
+    <title>Report</title>
+</head>
+<body>
     <h2>@Model.Name</h2>
     Email: @Model.Email
-    <hr class="divider"></hr>
+    <hr class="divider"/>
     <table>
         <tr><th>Key</th><th>Values</th></tr>
         @foreach (var item in @Model.Values) {
@@ -16,3 +22,4 @@
         }
     </table>
 </body>
+</html>

@@ -11,6 +11,7 @@ namespace RazorStandalone {
         /// </summary>
         [STAThread]
         static void Main () {
+            RazorConfiguration.Configure ();
             Application.EnableVisualStyles ();
             Application.SetCompatibleTextRenderingDefault (false);
             Application.Run (new Form1 ());

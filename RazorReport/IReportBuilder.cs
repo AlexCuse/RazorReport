@@ -4,14 +4,12 @@ using System.Reflection;
 
 namespace RazorReport {
     public interface IReportBuilder<T> {
-        IReportBuilder<T> WithTemplate (string templateString);
-        IReportBuilder<T> WithMasterTemplate (string templateString);
-        IReportBuilder<T> WithTemplateFromFileSystem (string templateFile);
-        IReportBuilder<T> WithMasterTemplateFromFileSystem (string templateFile);
-        IReportBuilder<T> WithTemplateFromResource (string templateFile, Assembly assembly);
-        IReportBuilder<T> WithMasterTemplateFromResource (string templateFile, Assembly assembly);
-
-        IReportBuilder<T> WithTitle (Expression<Func<T, string>> titleGenerator);
+        IReportBuilder<T> WithTemplate (string template);
+        IReportBuilder<T> WithCss (string css);
+        IReportBuilder<T> WithTemplateFromFileSystem (string templatePath);
+        IReportBuilder<T> WithCssFromFileSystem (string cssPath);
+        IReportBuilder<T> WithTemplateFromResource (string resourceName, Assembly assembly);
+        IReportBuilder<T> WithCssFromResource (string resourceName, Assembly assembly);
 
         string BuildHtml (T model);
     }

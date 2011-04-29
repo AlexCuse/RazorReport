@@ -1,8 +1,7 @@
 ﻿using RazorEngine;
 
 namespace RazorReport {
-    public class Engine<T> : IEngine<T>
-    {
+    public class Engine<T> : IEngine<T> {
         public void Compile (string preparedTemplate, string name) {
             Razor.Compile (preparedTemplate, typeof (T), name);
         }
