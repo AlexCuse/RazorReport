@@ -15,7 +15,7 @@ namespace RazorReport.Example {
             var assembly = Assembly.GetExecutingAssembly ();
 
             return ReportBuilder<Example>.Create ("modelReport")
-                //.WithCssFromResource ("RazorReport.Example.MasterTemplate.htm", assembly)
+                .WithCssFromResource ("RazorReport.Example.Style.css", assembly)
                 .WithTemplateFromResource ("RazorReport.Example.ExampleTemplate.htm", assembly)
                 .BuildHtml (model);
         }

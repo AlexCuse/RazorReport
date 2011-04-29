@@ -26,7 +26,7 @@ namespace RazorReport.Tests {
         }
 
         [Test]
-        public void Ignores_Css_Template_If_Not_Provided () {
+        public void Ignores_Stylesheet_If_Not_Provided () {
             var template = "@@STYLES THIS IS THE BODY";
 
             var builder = ReportBuilder<object>.Create ("testIgnoresMissingMaster")
@@ -86,7 +86,7 @@ namespace RazorReport.Tests {
 
             using (mockery.Record ()) {
                 engine.Compile (template, templateName);
-                LastCall.Repeat.Twice();
+                LastCall.Repeat.Twice ();
 
                 Expect.Call (engine.Run (model, templateName)).Repeat.Twice ().Return ("return");
             }
@@ -125,6 +125,36 @@ namespace RazorReport.Tests {
                 builder.BuildHtml (model);
 
                 model.Name = "changed";
+
+                builder.BuildHtml (model);
+            }
+        }
+
+        [Test]
+        public void Doesnt_Recompile_If_Template_Or_Stylesheet_Set_To_Same_Thing () {
+            var mockery = new MockRepository ();
+            var engine = mockery.StrictMock<IEngine<Example>> ();
+
+            var templateName = "doesntRecompileIfNoChange";
+            var template = "template";
+            var css = "css";
+            var model = new Example ();
+
+            using (mockery.Record ()) {
+                engine.Compile (template, templateName);//just once
+
+                Expect.Call (engine.Run (model, templateName)).Repeat.Twice ().Return ("return");
+            }
+
+            using (mockery.Playback ()) {
+                var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
+                    .WithTemplate (template)
+                    .WithCss (css);
+
+                builder.BuildHtml (model);
+
+                builder.WithTemplate (template)
+                    .WithCss (css);
 
                 builder.BuildHtml (model);
             }
