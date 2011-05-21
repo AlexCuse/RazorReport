@@ -11,6 +11,7 @@ namespace RazorReport {
         IReportBuilder<T> WithTemplateFromResource (string resourceName, Assembly assembly);
         IReportBuilder<T> WithCssFromResource (string resourceName, Assembly assembly);
 
-        string BuildHtml (T model);
+        string CompiledReport (T model);
+        string Report(T model);
     }
 }

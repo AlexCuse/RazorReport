@@ -47,12 +47,16 @@ namespace RazorReport {
             return WithCss (TemplateFinder.GetTemplateFromResource (resourceName, assembly));
         }
 
-        public string BuildHtml (T model) {
+        public string CompiledReport (T model) {
             if (needsCompilation) {
                 engine.Compile (PrepareTemplate (), name);
                 needsCompilation = false;
             }
             return engine.Run (model, name);
+        }
+
+        public string Report (T model) {
+            return engine.Parse (PrepareTemplate (), model);
         }
 
         string PrepareTemplate () {

@@ -5,23 +5,38 @@ using System.Windows.Forms;
 
 namespace RazorReport.Example {
     public partial class Form1 : Form {
+        IReportBuilder<Example> builder;
+
         public Form1 () {
             InitializeComponent ();
-        }
-
-        string Test () {
-            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Dogs", "Jasmine, Daisy" }, { "Cats", "Rocky, FuFu" } } };
 
             var assembly = Assembly.GetExecutingAssembly ();
 
-            return ReportBuilder<Example>.Create ("modelReport")
+            builder = ReportBuilder<Example>.Create ("modelReport")
                 .WithCssFromResource ("RazorReport.Example.Style.css", assembly)
-                .WithTemplateFromResource ("RazorReport.Example.ExampleTemplate.htm", assembly)
-                .BuildHtml (model);
+                .WithTemplateFromResource ("RazorReport.Example.ExampleTemplate.htm", assembly);
         }
 
-        private void button1_Click (object sender, EventArgs e) {
-            webBrowser1.DocumentText = Test ();
+
+
+        string RunCompiled () {
+            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "Yes" }, { "Worked", "Yes" } } };
+
+            return builder.CompiledReport (model);
+        }
+
+        string Run () {
+            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "No" }, { "Worked", "Yes" } } };
+
+            return builder.Report (model);
+        }
+
+        private void runCompiled_Click (object sender, EventArgs e) {
+            webBrowser1.DocumentText = RunCompiled ();
+        }
+
+        private void run_Click (object sender, EventArgs e) {
+            webBrowser1.DocumentText = Run ();
         }
     }
 }
