@@ -8,7 +8,7 @@ namespace RazorReport.Tests {
         [Test]
         public void Throws_Exception_If_Template_Undefined () {
             var ex = Assert.Throws (typeof (InvalidOperationException),
-                          () => ReportBuilder<object>.Create ("named").CompiledReport (null));
+                          () => ReportBuilder<object>.Create ("named").BuildReport (null));
 
             Assert.AreEqual ("ReportBuilder must have Template configured before use.", ex.Message);
         }
@@ -22,7 +22,7 @@ namespace RazorReport.Tests {
                 .WithCss (css)
                 .WithTemplate (template);
 
-            Assert.AreEqual ("some text and <style type='text/css'>" + Environment.NewLine + "THIS IS THE STYLES" + Environment.NewLine + "</style> and some more", builder.CompiledReport (null));
+            Assert.AreEqual ("some text and <style type='text/css'>" + Environment.NewLine + "THIS IS THE STYLES" + Environment.NewLine + "</style> and some more", builder.BuildReport (null));
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace RazorReport.Tests {
             var builder = ReportBuilder<object>.Create ("testIgnoresMissingMaster")
                 .WithTemplate (template);
 
-            Assert.AreEqual (" THIS IS THE BODY", builder.CompiledReport (null));
+            Assert.AreEqual (" THIS IS THE BODY", builder.BuildReport (null));
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace RazorReport.Tests {
             var builder = ReportBuilder<object>.Create ("test@Escape")
                 .WithTemplate (template);
 
-            Assert.AreEqual ("@", builder.CompiledReport (null));
+            Assert.AreEqual ("@", builder.BuildReport (null));
         }
 
         [Test]
@@ -64,13 +64,14 @@ namespace RazorReport.Tests {
 
             using (mockery.Playback ()) {
                 var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
-                    .WithTemplate (template);
+                    .WithTemplate (template)
+                    .WithPrecompilation ();
 
-                builder.CompiledReport (model);
+                builder.BuildReport (model);
 
                 builder = builder.WithTemplate (newTemplate);
 
-                builder.CompiledReport (model);
+                builder.BuildReport (model);
             }
         }
 
@@ -93,13 +94,14 @@ namespace RazorReport.Tests {
 
             using (mockery.Playback ()) {
                 var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
-                    .WithTemplate (template);
+                    .WithTemplate (template)
+                    .WithPrecompilation ();
 
-                builder.CompiledReport (model);
+                builder.BuildReport (model);
 
                 builder = builder.WithCss (css);
 
-                builder.CompiledReport (model);
+                builder.BuildReport (model);
             }
         }
 
@@ -120,13 +122,14 @@ namespace RazorReport.Tests {
 
             using (mockery.Playback ()) {
                 var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
-                    .WithTemplate (template);
+                    .WithTemplate (template)
+                    .WithPrecompilation ();
 
-                builder.CompiledReport (model);
+                builder.BuildReport (model);
 
                 model.Name = "changed";
 
-                builder.CompiledReport (model);
+                builder.BuildReport (model);
             }
         }
 
@@ -149,14 +152,15 @@ namespace RazorReport.Tests {
             using (mockery.Playback ()) {
                 var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
                     .WithTemplate (template)
-                    .WithCss (css);
+                    .WithCss (css)
+                    .WithPrecompilation ();
 
-                builder.CompiledReport (model);
+                builder.BuildReport (model);
 
                 builder.WithTemplate (template)
                     .WithCss (css);
 
-                builder.CompiledReport (model);
+                builder.BuildReport (model);
             }
         }
     }

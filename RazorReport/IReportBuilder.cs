@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace RazorReport {
     public interface IReportBuilder<T> {
@@ -10,8 +8,8 @@ namespace RazorReport {
         IReportBuilder<T> WithCssFromFileSystem (string cssPath);
         IReportBuilder<T> WithTemplateFromResource (string resourceName, Assembly assembly);
         IReportBuilder<T> WithCssFromResource (string resourceName, Assembly assembly);
+        IReportBuilder<T> WithPrecompilation ();
 
-        string CompiledReport (T model);
-        string Report(T model);
+        string BuildReport (T model);
     }
 }

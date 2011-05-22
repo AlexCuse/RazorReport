@@ -6,6 +6,7 @@ namespace RazorReport {
         string name;
         string mainTemplate;
         string styleSheet;
+        bool precompile;
         bool needsCompilation = true;
         IEngine<T> engine;
 
@@ -47,7 +48,16 @@ namespace RazorReport {
             return WithCss (TemplateFinder.GetTemplateFromResource (resourceName, assembly));
         }
 
-        public string CompiledReport (T model) {
+        public IReportBuilder<T> WithPrecompilation () {
+            precompile = true;
+            return this;
+        }
+
+        public string BuildReport (T model) {
+            return precompile ? CompiledReport (model) : Report (model);
+        }
+
+        string CompiledReport (T model) {
             if (needsCompilation) {
                 engine.Compile (PrepareTemplate (), name);
                 needsCompilation = false;
@@ -55,7 +65,7 @@ namespace RazorReport {
             return engine.Run (model, name);
         }
 
-        public string Report (T model) {
+        string Report (T model) {
             return engine.Parse (PrepareTemplate (), model);
         }
 

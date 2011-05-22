@@ -6,6 +6,7 @@ using System.Windows.Forms;
 namespace RazorReport.Example {
     public partial class Form1 : Form {
         IReportBuilder<Example> builder;
+        IReportBuilder<Example> precompilingBuilder;
 
         public Form1 () {
             InitializeComponent ();
@@ -15,6 +16,11 @@ namespace RazorReport.Example {
             builder = ReportBuilder<Example>.Create ("modelReport")
                 .WithCssFromResource ("RazorReport.Example.Style.css", assembly)
                 .WithTemplateFromResource ("RazorReport.Example.ExampleTemplate.htm", assembly);
+
+            precompilingBuilder = ReportBuilder<Example>.Create ("modelReport")
+                .WithCssFromResource ("RazorReport.Example.Style.css", assembly)
+                .WithTemplateFromResource ("RazorReport.Example.ExampleTemplate.htm", assembly)
+                .WithPrecompilation ();
         }
 
 
@@ -22,13 +28,13 @@ namespace RazorReport.Example {
         string RunCompiled () {
             var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "Yes" }, { "Worked", "Yes" } } };
 
-            return builder.CompiledReport (model);
+            return builder.BuildReport (model);
         }
 
         string Run () {
             var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "No" }, { "Worked", "Yes" } } };
 
-            return builder.Report (model);
+            return builder.BuildReport (model);
         }
 
         private void runCompiled_Click (object sender, EventArgs e) {
