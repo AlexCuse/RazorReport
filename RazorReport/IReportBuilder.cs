@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 
 namespace RazorReport {
     public interface IReportBuilder<T> {
@@ -9,7 +10,9 @@ namespace RazorReport {
         IReportBuilder<T> WithTemplateFromResource (string resourceName, Assembly assembly);
         IReportBuilder<T> WithCssFromResource (string resourceName, Assembly assembly);
         IReportBuilder<T> WithPrecompilation ();
+        IReportBuilder<T> WithPdfRenderer (IPdfRenderer renderer);
 
         string BuildReport (T model);
+        Stream BuildPdf (T model);
     }
 }

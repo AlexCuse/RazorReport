@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using NUnit.Framework;
 using Rhino.Mocks;
 
@@ -162,6 +163,44 @@ namespace RazorReport.Tests {
 
                 builder.BuildReport (model);
             }
+        }
+
+        [Test]
+        public void WithPdfRenderer () {
+            var mockery = new MockRepository ();
+            var renderer = mockery.StrictMock<IPdfRenderer> ();
+            var engine = mockery.StrictMock<IEngine<Example>> ();
+
+            var templateName = "templateName";
+            var template = "template";
+            var model = new Example ();
+            var rendered = "rendered";
+            var pdf = new MemoryStream ();
+
+            using (mockery.Record ()) {
+                engine.Compile (template, templateName);
+                SetupResult.For (engine.Run (model, templateName)).Return (rendered);
+
+                Expect.Call (renderer.RenderFromHtml (rendered)).Return (pdf);
+            }
+
+            using (mockery.Playback ()) {
+                var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
+                    .WithTemplate (template)
+                    .WithPdfRenderer (renderer)
+                    .WithPrecompilation ();
+
+                var output = builder.BuildPdf (model);
+                Assert.AreEqual (output, pdf);
+            }
+        }
+
+        [Test]
+        public void Exception_If_No_PdfRenderer () {
+            var builder = ReportBuilder<Example>.Create ("asdf");
+
+            var ex = Assert.Throws (typeof (InvalidOperationException), () => builder.BuildPdf (new Example ()));
+            Assert.AreEqual ("No PDF Renderer has been configured.", ex.Message);
         }
     }
 }
