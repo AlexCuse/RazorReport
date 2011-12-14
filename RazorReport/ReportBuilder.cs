@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
 
 namespace RazorReport {
@@ -10,7 +9,8 @@ namespace RazorReport {
         bool precompile;
         bool needsCompilation = true;
         IEngine<T> engine;
-        IPdfRenderer pdfRenderer = null;
+        IPdfRenderer pdfRenderer;
+        bool stripStylesForPdfRendering;
 
         private ReportBuilder () { }
 
@@ -55,7 +55,8 @@ namespace RazorReport {
             return this;
         }
 
-        public IReportBuilder<T> WithPdfRenderer (IPdfRenderer renderer) {
+        public IReportBuilder<T> WithPdfRenderer (IPdfRenderer renderer, bool stripStyles = true) {
+            stripStylesForPdfRendering = stripStyles;
             pdfRenderer = renderer;
             return this;
         }
@@ -64,11 +65,13 @@ namespace RazorReport {
             return precompile ? CompiledReport (model) : Report (model);
         }
 
-        public Stream BuildPdf (T model) {
+        public byte[] BuildPdf (T model) {
             if (pdfRenderer == null) {
                 throw new InvalidOperationException ("No PDF Renderer has been configured.");
             }
-            return pdfRenderer.RenderFromHtml (BuildReport (model));
+            var html = BuildReport (model);
+            if (stripStylesForPdfRendering) html = html.Replace (this.styleSheet, "");
+            return pdfRenderer.RenderFromHtml (html);
         }
 
         string CompiledReport (T model) {

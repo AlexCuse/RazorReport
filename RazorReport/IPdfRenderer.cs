@@ -1,7 +1,5 @@
-﻿using System.IO;
-
-namespace RazorReport {
+﻿namespace RazorReport {
     public interface IPdfRenderer {
-        Stream RenderFromHtml (string html);
+        byte[] RenderFromHtml (string html);
     }
 }

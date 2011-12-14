@@ -173,9 +173,43 @@ namespace RazorReport.Tests {
 
             var templateName = "templateName";
             var template = "template";
+            var css = "css";
             var model = new Example ();
-            var rendered = "rendered";
-            var pdf = new MemoryStream ();
+            var rendered = "cssrendered";
+            var strippedRendered = "rendered";
+            var pdf = new byte[0];
+
+            using (mockery.Record ()) {
+                engine.Compile (template, templateName);
+                SetupResult.For (engine.Run (model, templateName)).Return (rendered);
+
+                Expect.Call (renderer.RenderFromHtml (strippedRendered)).Return (pdf);
+            }
+
+            using (mockery.Playback ()) {
+                var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
+                    .WithTemplate (template)
+                    .WithCss (css)
+                    .WithPdfRenderer (renderer)
+                    .WithPrecompilation ();
+
+                var output = builder.BuildPdf (model);
+                Assert.AreEqual (output, pdf);
+            }
+        }
+
+        [Test]
+        public void WithPdfRenderer_KeepStyles () {
+            var mockery = new MockRepository ();
+            var renderer = mockery.StrictMock<IPdfRenderer> ();
+            var engine = mockery.StrictMock<IEngine<Example>> ();
+
+            var templateName = "templateName";
+            var template = "template";
+            var css = "css";
+            var model = new Example ();
+            var rendered = "cssrendered";
+            var pdf = new byte[0];
 
             using (mockery.Record ()) {
                 engine.Compile (template, templateName);
@@ -187,7 +221,8 @@ namespace RazorReport.Tests {
             using (mockery.Playback ()) {
                 var builder = ReportBuilder<Example>.CreateWithEngineInstance (templateName, engine)
                     .WithTemplate (template)
-                    .WithPdfRenderer (renderer)
+                    .WithCss (css)
+                    .WithPdfRenderer (renderer, false)
                     .WithPrecompilation ();
 
                 var output = builder.BuildPdf (model);

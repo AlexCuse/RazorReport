@@ -86,6 +86,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RazorReport.Pdf\RazorReport.Pdf.csproj">
+      <Project>{0473BC90-3850-45E2-912E-9265C792219A}</Project>
+      <Name>RazorReport.Pdf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RazorReport\RazorReport.csproj">
       <Project>{5F85C306-C30D-44CC-9B97-230E8D9A2FF7}</Project>
       <Name>RazorReport</Name>
