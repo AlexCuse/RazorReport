@@ -2,16 +2,16 @@
 using System.Reflection;
 
 namespace RazorReport {
-    class TemplateFinder {
+    class ContentFinder {
 
-        public static string GetTemplateFromResource (string resourceName, Assembly assembly) {
+        public static string GetFromResource (string resourceName, Assembly assembly) {
             using (var stream = assembly.GetManifestResourceStream (resourceName))
             using (TextReader reader = new StreamReader (stream)) {
                 return reader.ReadToEnd ();
             }
         }
 
-        public static string GetTemplateFromFileSystem (string templatePath) {
+        public static string GetFromFileSystem (string templatePath) {
             return File.ReadAllText (templatePath);
         }
     }

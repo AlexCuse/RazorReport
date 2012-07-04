@@ -8,5 +8,6 @@ namespace RazorReport.Tests {
         public string NameAndEmail () {
             return Name + " " + Email;
         }
+        public byte[] Image { get; set; }
     }
 }

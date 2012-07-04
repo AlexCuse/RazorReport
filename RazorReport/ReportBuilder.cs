@@ -6,6 +6,7 @@ namespace RazorReport {
         string name;
         string mainTemplate;
         string styleSheet;
+        string helpers;
         bool precompile;
         bool needsCompilation = true;
         IEngine<T> engine;
@@ -29,11 +30,11 @@ namespace RazorReport {
         }
 
         public IReportBuilder<T> WithTemplateFromFileSystem (string templatePath) {
-            return WithTemplate (TemplateFinder.GetTemplateFromFileSystem (templatePath));
+            return WithTemplate (ContentFinder.GetFromFileSystem (templatePath));
         }
 
         public IReportBuilder<T> WithTemplateFromResource (string resourceName, Assembly assembly) {
-            return WithTemplate (TemplateFinder.GetTemplateFromResource (resourceName, assembly));
+            return WithTemplate (ContentFinder.GetFromResource (resourceName, assembly));
         }
 
         public IReportBuilder<T> WithCss (string css) {
@@ -43,11 +44,25 @@ namespace RazorReport {
         }
 
         public IReportBuilder<T> WithCssFromFileSystem (string cssPath) {
-            return WithCss (TemplateFinder.GetTemplateFromFileSystem (cssPath));
+            return WithCss (ContentFinder.GetFromFileSystem (cssPath));
         }
 
         public IReportBuilder<T> WithCssFromResource (string resourceName, Assembly assembly) {
-            return WithCss (TemplateFinder.GetTemplateFromResource (resourceName, assembly));
+            return WithCss (ContentFinder.GetFromResource (resourceName, assembly));
+        }
+
+        public IReportBuilder<T> WithHelpers(string razorHelpers) {
+            needsCompilation = helpers != razorHelpers;
+            helpers = razorHelpers;
+            return this;
+        }
+
+        public IReportBuilder<T> WithHelpersFromFileSystem (string helperFilePath) {
+            return WithHelpers (ContentFinder.GetFromFileSystem (helperFilePath));
+        }
+
+        public IReportBuilder<T> WithHelpersFromResource (string resourceName, Assembly assembly) {
+            return WithHelpers (ContentFinder.GetFromResource (resourceName, assembly));
         }
 
         public IReportBuilder<T> WithPrecompilation () {
@@ -89,7 +104,8 @@ namespace RazorReport {
         string PrepareTemplate () {
             if (string.IsNullOrEmpty (mainTemplate))
                 throw new InvalidOperationException ("ReportBuilder must have Template configured before use.");
-            return mainTemplate.Replace ("@@STYLES", PrepareStylesheet ());
+            return mainTemplate.Replace ("@@STYLES", PrepareStylesheet ())
+                .Replace("@@HELPERS", helpers ?? string.Empty);
         }
 
         string PrepareStylesheet () {
