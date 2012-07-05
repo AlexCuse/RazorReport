@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
@@ -30,19 +31,28 @@ namespace RazorReport.Example {
 
 
         string RunCompiled () {
-            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "Yes" }, { "Worked", "Yes" } } };
+            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "Yes" }, { "Worked", "Yes" } }, Image = GetTestImage () };
 
             return precompilingBuilder.BuildReport (model);
         }
 
+        byte[] GetTestImage () {
+            string filename = "testImage.png";
+            var size = (int)new FileInfo (filename).Length;
+            using (var stream = File.Open (filename, FileMode.Open))
+            using (var reader = new BinaryReader (stream)) {
+                return reader.ReadBytes (size);
+            }
+        }
+
         string Run () {
-            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "No" }, { "Worked", "Yes" } } };
+            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "No" }, { "Worked", "Yes" } }, Image = GetTestImage () };
 
             return builder.BuildReport (model);
         }
 
         byte[] RunPdf () {
-            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "No" }, { "Worked", "Yes" } } };
+            var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "No" }, { "Worked", "Yes" } }, Image = GetTestImage() };
 
             return builder.BuildPdf (model);
         }
