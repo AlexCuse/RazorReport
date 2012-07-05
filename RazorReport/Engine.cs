@@ -7,7 +7,7 @@ namespace RazorReport {
         }
 
         public string Run (T model, string name) {
-            return Razor.Run<T> (model, name);
+            return Razor.Run<T> (name, model);
         }
 
         public string Parse (string template, T model) {
