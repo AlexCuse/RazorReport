@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
@@ -20,7 +18,7 @@ namespace RazorReport.Example {
             builder = ReportBuilder<Example>.Create ("modelReport")
                 .WithCssFromResource ("RazorReport.Example.Style.css", assembly)
                 .WithTemplateFromResource ("RazorReport.Example.ExampleTemplate.htm", assembly)
-                .WithPdfRenderer (new PdfRenderer ());
+                .WithCustomRenderer (new PdfRenderer ());
 
             precompilingBuilder = ReportBuilder<Example>.Create ("modelReport")
                 .WithCssFromResource ("RazorReport.Example.Style.css", assembly)
@@ -54,7 +52,7 @@ namespace RazorReport.Example {
         byte[] RunPdf () {
             var model = new Example { Name = "Alex", Email = "test@example.com", Values = new Dictionary<object, object> { { "Compiled", "No" }, { "Worked", "Yes" } }, Image = GetTestImage() };
 
-            return builder.BuildPdf (model);
+            return builder.BuildCustomRendering (model);
         }
 
         private void runCompiled_Click (object sender, EventArgs e) {

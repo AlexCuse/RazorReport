@@ -167,9 +167,9 @@ namespace RazorReport.Tests {
         }
 
         [Test]
-        public void WithPdfRenderer() {
+        public void WithCustomRenderer() {
             var mockery = new MockRepository();
-            var renderer = mockery.StrictMock<IPdfRenderer>();
+            var renderer = mockery.StrictMock<ICustomRenderer>();
             var engine = mockery.StrictMock<IEngine<Example>>();
 
             var templateName = "templateName";
@@ -191,18 +191,18 @@ namespace RazorReport.Tests {
                 var builder = ReportBuilder<Example>.CreateWithEngineInstance(templateName, engine)
                     .WithTemplate(template)
                     .WithCss(css)
-                    .WithPdfRenderer(renderer)
+                    .WithCustomRenderer(renderer)
                     .WithPrecompilation();
 
-                var output = builder.BuildPdf(model);
+                var output = builder.BuildCustomRendering(model);
                 Assert.AreEqual(output, pdf);
             }
         }
 
         [Test]
-        public void WithPdfRenderer_KeepStyles() {
+        public void WithCustomRenderer_KeepStyles() {
             var mockery = new MockRepository();
-            var renderer = mockery.StrictMock<IPdfRenderer>();
+            var renderer = mockery.StrictMock<ICustomRenderer>();
             var engine = mockery.StrictMock<IEngine<Example>>();
 
             var templateName = "templateName";
@@ -223,20 +223,20 @@ namespace RazorReport.Tests {
                 var builder = ReportBuilder<Example>.CreateWithEngineInstance(templateName, engine)
                     .WithTemplate(template)
                     .WithCss(css)
-                    .WithPdfRenderer(renderer, false)
+                    .WithCustomRenderer(renderer, false)
                     .WithPrecompilation();
 
-                var output = builder.BuildPdf(model);
+                var output = builder.BuildCustomRendering(model);
                 Assert.AreEqual(output, pdf);
             }
         }
 
         [Test]
-        public void Exception_If_No_PdfRenderer() {
+        public void BuildCustomRendering_Throws_If_No_Custom_Renderer() {
             var builder = ReportBuilder<Example>.Create("asdf");
 
-            var ex = Assert.Throws(typeof(InvalidOperationException), () => builder.BuildPdf(new Example()));
-            Assert.AreEqual("No PDF Renderer has been configured.", ex.Message);
+            var ex = Assert.Throws(typeof(InvalidOperationException), () => builder.BuildCustomRendering(new Example()));
+            Assert.AreEqual("No Custom Renderer has been configured.", ex.Message);
         }
 
         [Test]

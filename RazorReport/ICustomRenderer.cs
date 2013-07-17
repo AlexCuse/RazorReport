@@ -1,5 +1,5 @@
 ﻿namespace RazorReport {
-    public interface IPdfRenderer {
+    public interface ICustomRenderer {
         byte[] RenderFromHtml (string html);
     }
 }

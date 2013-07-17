@@ -12,9 +12,9 @@ namespace RazorReport {
         IReportBuilder<T> WithCssFromResource (string resourceName, Assembly assembly);
 
         IReportBuilder<T> WithPrecompilation ();
-        IReportBuilder<T> WithPdfRenderer (IPdfRenderer renderer, bool stripStyles = true);
+        IReportBuilder<T> WithCustomRenderer (ICustomRenderer renderer, bool stripStyles = true);
 
         string BuildReport (T model);
-        byte[] BuildPdf (T model);
+        byte[] BuildCustomRendering (T model);
     }
 }

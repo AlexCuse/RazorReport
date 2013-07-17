@@ -10,7 +10,7 @@ namespace RazorReport {
         bool precompile;
         bool needsCompilation = true;
         IEngine<T> engine;
-        IPdfRenderer pdfRenderer;
+        ICustomRenderer _customRenderer;
         bool stripStylesForPdfRendering;
 
         private ReportBuilder () { }
@@ -70,9 +70,9 @@ namespace RazorReport {
             return this;
         }
 
-        public IReportBuilder<T> WithPdfRenderer (IPdfRenderer renderer, bool stripStyles = true) {
+        public IReportBuilder<T> WithCustomRenderer (ICustomRenderer renderer, bool stripStyles = true) {
             stripStylesForPdfRendering = stripStyles;
-            pdfRenderer = renderer;
+            _customRenderer = renderer;
             return this;
         }
 
@@ -80,13 +80,13 @@ namespace RazorReport {
             return precompile ? CompiledReport (model) : Report (model);
         }
 
-        public byte[] BuildPdf (T model) {
-            if (pdfRenderer == null) {
-                throw new InvalidOperationException ("No PDF Renderer has been configured.");
+        public byte[] BuildCustomRendering (T model) {
+            if (_customRenderer == null) {
+                throw new InvalidOperationException ("No Custom Renderer has been configured.");
             }
             var html = BuildReport (model);
             if (stripStylesForPdfRendering) html = html.Replace (this.styleSheet, "");
-            return pdfRenderer.RenderFromHtml (html);
+            return _customRenderer.RenderFromHtml (html);
         }
 
         string CompiledReport (T model) {
